@@ -1,0 +1,34 @@
+{
+  "properties": {
+    "id": {
+      "type": "completion",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    },
+    "createTime": {
+      "type": "long"
+    },
+    "name": {
+      "type": "text",
+      "analyzer": "standard",
+      "search_analyzer": "standard",
+      "fields": {
+        "suggest": {
+          "type": "completion",
+          "analyzer": "standard",
+          "search_analyzer": "standard"
+        }
+      }
+    },
+    "partner": {
+      "type": "completion",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    },
+    "sub": {
+      "type": "completion",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    }
+  }
+}
