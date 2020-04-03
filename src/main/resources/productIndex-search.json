@@ -1,0 +1,47 @@
+{
+  "properties": {
+    "id": {
+      "type": "completion",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    },
+    "createTime": {
+      "type": "long"
+    },
+    "keyword": {
+      "type": "text",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    },
+    "suggest": {
+      "type": "text",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    },
+    "term": {
+      "type": "text",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    },
+    "clickUrl": {
+      "type": "completion",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    },
+    "imageUrl": {
+      "type": "completion",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    },
+    "impressionUrl": {
+      "type": "completion",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    },
+    "labelRequired": {
+      "type": "completion",
+      "analyzer": "standard",
+      "search_analyzer": "standard"
+    }
+  }
+}

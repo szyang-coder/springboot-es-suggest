@@ -90,5 +90,6 @@ public class EsSuggestApplicationTests {
     public void deleteIndex() {
         log.info("【删除索引库】");
         esSearchService.deleteIndex("merchandise");
+        esSearchService.deleteIndex("suggest");
     }
 }

@@ -12,61 +12,100 @@ import java.util.Date;
  * @author yangjx
  */
 @Document(indexName = "merchandise", type = "product")
-@Mapping(mappingPath = "productIndex-suggest.json")
+@Mapping(mappingPath = "productIndex-search.json")
 public class Product implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
     private String id;
-    //@Field(analyzer = "standard",searchAnalyzer = "standard")
     
-    private String name;
-    //@Field(analyzer = "standard",searchAnalyzer = "standard")
-    
-    private String partner;
+	private String keyword;
+	
+	private String suggest;
 
-	private String sub;
+	private String term;
+    //@Field(analyzer = "standard",searchAnalyzer = "standard")
+    
+    private String clickUrl;
+
+	private String imageUrl;
+	
+	private String impressionUrl;
+	
+	private String labelRequired;
 
     private Date createTime;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPartner() {
-        return partner;
-    }
-
-    public void setPartner(String partner) {
-        this.partner = partner;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getSub() {
-		return sub;
+	public String getId() {
+		return id;
 	}
 
-	public void setSub(String sub) {
-		this.sub = sub;
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+
+    public String getSuggest() {
+		return suggest;
+	}
+
+	public void setSuggest(String suggest) {
+		this.suggest = suggest;
+	}
+	
+	public String getTerm() {
+		return term;
+	}
+
+	public void setTerm(String term) {
+		this.term = term;
+	}
+
+	public String getClickUrl() {
+		return clickUrl;
+	}
+
+	public void setClickUrl(String clickUrl) {
+		this.clickUrl = clickUrl;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public String getImpressionUrl() {
+		return impressionUrl;
+	}
+
+	public void setImpressionUrl(String impressionUrl) {
+		this.impressionUrl = impressionUrl;
+	}
+
+	public String getLabelRequired() {
+		return labelRequired;
+	}
+
+	public void setLabelRequired(String labelRequired) {
+		this.labelRequired = labelRequired;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 }

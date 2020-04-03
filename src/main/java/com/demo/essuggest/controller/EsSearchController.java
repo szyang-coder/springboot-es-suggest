@@ -24,7 +24,6 @@ public class EsSearchController {
 	@Autowired
     private EsSearchService esSearchService;
 
-
     @Autowired
     private ElasticsearchTemplate elasticsearchTemplate;
 
@@ -81,13 +80,13 @@ public class EsSearchController {
 
     /**
      * 搜索
-     * @param keyword
+     * @param qt
      * @return
      */
     @SuppressWarnings("unchecked")
-	@RequestMapping("query/{keyword}")
-    public List<Product> query(@PathVariable String keyword){
-        return esSearchService.query(keyword,Product.class);
+	@RequestMapping("demo/query")
+    public List<Product> query(@RequestParam String qt){
+        return esSearchService.query(qt,Product.class);
     }
 
     /**

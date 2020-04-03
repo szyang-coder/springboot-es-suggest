@@ -5,10 +5,7 @@
       "analyzer": "standard",
       "search_analyzer": "standard"
     },
-    "createTime": {
-      "type": "long"
-    },
-    "name": {
+    "suggest": {
       "type": "text",
       "analyzer": "standard",
       "search_analyzer": "standard",
@@ -19,16 +16,6 @@
           "search_analyzer": "standard"
         }
       }
-    },
-    "partner": {
-      "type": "completion",
-      "analyzer": "standard",
-      "search_analyzer": "standard"
-    },
-    "sub": {
-      "type": "completion",
-      "analyzer": "standard",
-      "search_analyzer": "standard"
     }
   }
 }

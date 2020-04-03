@@ -2,7 +2,10 @@ package com.demo.essuggest.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.demo.essuggest.document.Product;
+import com.demo.essuggest.document.SuggestDoc;
 import com.demo.essuggest.repository.ProductRepository;
+import com.demo.essuggest.repository.SuggestDocRepository;
+import com.demo.essuggest.service.AsyncService;
 import com.demo.essuggest.service.EsSearchService;
 import com.demo.essuggest.utils.RedisUtil;
 
@@ -47,6 +50,8 @@ public class EsSearchServiceImpl<T> implements EsSearchService<T> {
     private ElasticsearchTemplate elasticsearchTemplate;
     @Resource
     private ProductRepository productRepository;
+    @Resource
+    private SuggestDocRepository suggestRepository;
 
     @Autowired
     private Client client;
@@ -54,14 +59,27 @@ public class EsSearchServiceImpl<T> implements EsSearchService<T> {
     @Autowired
     private RedisUtil redis;
     
-    @Override
+    @Autowired
+    AsyncService asyncService;
+    
+    @SuppressWarnings("unchecked")
+	@Override
     public List<T> query(String keyword, Class<T> clazz) {
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(new QueryStringQueryBuilder(keyword))
                 .withSort(SortBuilders.scoreSort().order(SortOrder.DESC))
                 .build();
 
-        return elasticsearchTemplate.queryForList(searchQuery,clazz);
+        List<T> result = elasticsearchTemplate.queryForList(searchQuery,clazz);
+        if(result.size()==0){
+        	asyncService.executeAsync(keyword);
+        	
+        	//阻塞10秒，等待redis队列中返回keyword对应的值
+        	Object cache = redis.leftPop("fetchdata:" + keyword, 20);
+        	if(cache!=null) result = (List<T>)cache;
+        }
+
+        return result;
     }
 
     /**
@@ -139,6 +157,17 @@ public class EsSearchServiceImpl<T> implements EsSearchService<T> {
     public void deleteIndex(String indexName) {
         elasticsearchTemplate.deleteIndex(indexName);
     }
+
+    @Override
+    public void save(Product product) {
+        elasticsearchTemplate.putMapping(Product.class);
+        if(product != null){
+            /*Arrays.asList(products).parallelStream()
+                    .map(productRepository::save)
+                    .forEach(product -> log.info("【保存数据】：{}", JSON.toJSONString(product)));*/
+            log.info("【保存索引】：{}",JSON.toJSONString(productRepository.save(product)));
+        }
+    }
     
     @Override
     public void save(List<Product> products) {
@@ -151,6 +180,14 @@ public class EsSearchServiceImpl<T> implements EsSearchService<T> {
         }
     }
 
+    @Override
+    public void addSuggest(List<SuggestDoc> suggests) {
+        elasticsearchTemplate.putMapping(SuggestDoc.class);
+        if(suggests.size() > 0){
+            log.info("【保存索引】：{}",JSON.toJSONString(suggestRepository.saveAll(suggests)));
+        }
+    }
+    
     @Override
     public void delete(String id) {
         productRepository.deleteById(id);
@@ -183,24 +220,15 @@ public class EsSearchServiceImpl<T> implements EsSearchService<T> {
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<String> suggest(String partner, String sub, String qt){
-    	Object cache = redis.get(qt);
-    	if(cache!=null){
-			return (List<String>)cache;
-    	}
+
         //field的名字,前缀(输入的text),以及大小size
-        CompletionSuggestionBuilder suggestionBuilderDistrict = SuggestBuilders.completionSuggestion("name.suggest")
+        CompletionSuggestionBuilder suggestionBuilderDistrict = SuggestBuilders.completionSuggestion("suggest.suggest")
                 .prefix(qt).size(100);
         SuggestBuilder suggestBuilder = new SuggestBuilder();
         suggestBuilder.addSuggestion("my-suggest", suggestionBuilderDistrict);//添加suggest my-suggest自定义的随便取的
         
-        //构造查询条件，完全匹配partner、sub字段
-        QueryBuilder queryBuilder = QueryBuilders.boolQuery()
-                .must(QueryBuilders.termQuery("partner", partner))
-                .must(QueryBuilders.termQuery("sub", sub));
-        
         //设置查询builder的index,type,以及建议
-        SearchRequestBuilder requestBuilder = client.prepareSearch("merchandise").setTypes("product")
-        	.setQuery(queryBuilder)
+        SearchRequestBuilder requestBuilder = client.prepareSearch("suggest").setTypes("suggest")
         	.suggest(suggestBuilder);
         System.out.println(requestBuilder.toString());
 
@@ -209,7 +237,6 @@ public class EsSearchServiceImpl<T> implements EsSearchService<T> {
 
         Set<String> suggestSet = new HashSet<>();//set
         int maxSuggest = 0;
-        boolean match = false;
         if (suggest!=null){
 			Suggest.Suggestion result = suggest.getSuggestion("my-suggest");//获取suggest,name任意string
             for (Object term : result.getEntries()) {
@@ -219,15 +246,10 @@ public class EsSearchServiceImpl<T> implements EsSearchService<T> {
                         //若item的option不为空,循环遍历
                         for (CompletionSuggestion.Entry.Option option : item.getOptions()) {
                             String tip = option.getText().toString();
-                            if (tip.equals(qt)){
-                            	match = true;
-                            }
-                            else{
-                            	 if(!suggestSet.contains(tip)){
-                                     suggestSet.add(tip);
-                                     ++maxSuggest;
-                            	 }
-                            }
+                        	if(!suggestSet.contains(tip)){
+                        		suggestSet.add(tip);
+                                ++maxSuggest;
+                        	}
                         }
                     }
                 }
@@ -237,12 +259,7 @@ public class EsSearchServiceImpl<T> implements EsSearchService<T> {
             }
         }
         List<String> suggests = Arrays.asList(suggestSet.toArray(new String[]{}));
-        
-        //其实没必要，只是为了展现redis缓存功能
-        if(match && maxSuggest>0){
-        	//搜索建议按关键词缓存1小时
-        	redis.set(qt, suggests, 3600);
-        }
+
         return suggests;
     }
 }

@@ -522,4 +522,35 @@ public class RedisUtil {
             return 0;
         }
     }
+    
+    /**
+     * 放入队列
+     * @param key 键
+     * @param value 值
+     * @return 是否成功
+     */
+    public boolean rightPush(String key,Object value) {
+        try {
+            redisTemplate.opsForList().rightPush(key, value);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * 从队列里阻塞取key对应的值
+     * @param key 键
+     * @param time 阻塞事件
+     * @return key对应的值，time时间后返回null
+     */
+    public Object leftPop(String key,long timeout) {
+        try {
+            return key==null?null:redisTemplate.opsForList().leftPop(key, timeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

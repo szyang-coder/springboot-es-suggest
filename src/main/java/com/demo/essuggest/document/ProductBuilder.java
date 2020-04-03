@@ -21,13 +21,22 @@ public class ProductBuilder {
         return this;
     }
 
-    public ProductBuilder addName(String name) {
-        product.setName(name);
+    public ProductBuilder addKeyword(String keyword) {
+        product.setKeyword(keyword);
+        return this;
+    }
+  
+    public ProductBuilder addSuggest(String suggest) {
+        product.setSuggest(suggest);
+        return this;
+    }
+    public ProductBuilder addTerm(String term) {
+        product.setTerm(term);
         return this;
     }
 
-    public ProductBuilder addPartner(String partner) {
-        product.setPartner(partner);
+    public ProductBuilder addClickUrl(String clickUrl) {
+        product.setClickUrl(clickUrl);
         return this;
     }
 
@@ -36,8 +45,18 @@ public class ProductBuilder {
         return this;
     }
 
-    public ProductBuilder addSub(String sub) {
-        product.setSub(sub);
+    public ProductBuilder addImageUrl(String imageUrl) {
+        product.setImageUrl(imageUrl);
+        return this;
+    }
+    
+    public ProductBuilder addImpressionUrl(String impressionUrl) {
+        product.setImpressionUrl(impressionUrl);
+        return this;
+    }
+    
+    public ProductBuilder addLabelRequired(String labelRequired) {
+        product.setLabelRequired(labelRequired);
         return this;
     }
 

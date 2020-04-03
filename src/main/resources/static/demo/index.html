@@ -37,7 +37,7 @@
 		$searchInput.attr('autocomplete','off'); 
 		
 		//创建自动完成的下拉列表，用于显示服务器返回的数据,插入在搜索按钮的后面，等显示的时候再调整位置 
-		var $autocomplete = $('<div class="autocomplete"></div>').hide().insertAfter('#seg');
+		var $autocomplete = $('<div class="autocomplete"></div>').hide().insertAfter('#submit');
 		
 		//清空下拉列表的内容并且隐藏下拉列表区 
 		var clear = function(){
@@ -75,7 +75,7 @@
 		var ajax_request = function(){ 
 			//ajax服务端通信 
 			$.ajax({
-				'url': $('#seg').attr('checked')?'/demo/suggestSeg':'/demo/suggest', //服务器的地址 
+				'url': '/demo/suggest', //服务器的地址 
 				'data':{'partner':'umecps','sub':'test','qt':$searchInput.val()}, //参数 
 				'dataType':'json', //返回数据类型 
 				'type':'POST', //请求类型 
@@ -117,6 +117,26 @@
 				} 
 			}); 
 		};
+		
+		$(submit).click(function(event){ 
+			//ajax服务端通信 
+			$.ajax({
+				'url': '/demo/query', //服务器的地址 
+				'data':{'qt':$searchInput.val()}, //参数 
+				'dataType':'json', //返回数据类型 
+				'type':'POST', //请求类型 
+				'success':function(data){ 
+					if(data.length) {
+						//遍历data，添加到自动完成区 
+						$(result).html("");
+						$.each(data, function(index,term) {
+							//创建li标签,添加到下拉列表中 
+							$('<li></li>').html("<a href='" + term['clickUrl'] + "' target='_blank'>" + term['term'] + "</a>").appendTo($(result)); 
+						});//事件注册完毕 
+					} 
+				} 
+			}); 
+		});
 		
 		//对输入框进行事件注册 
 		$searchInput.keyup(function(event) { 
@@ -182,7 +202,10 @@
 <body> 
 <div id="search">
 <label for="search-text">请输入关键词：</label><input type="text" id="search-text" name="search-text" /> 
-<label for="seg"> 分词</label><input type="checkbox" id="seg" /> 
+<input type="button" id="submit" value="搜索" />
+<br/>
+<br/>
+<div id="result"></div>
 </div> 
 </body> 
 </html> 

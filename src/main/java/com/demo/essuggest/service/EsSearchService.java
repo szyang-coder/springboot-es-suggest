@@ -1,6 +1,7 @@
 package com.demo.essuggest.service;
 
 import com.demo.essuggest.document.Product;
+import com.demo.essuggest.document.SuggestDoc;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ public interface EsSearchService<T> {
     /**
      * 保存
      */
+    void save(Product product);
     void save(List<Product> products);
 
     /**
@@ -66,4 +68,10 @@ public interface EsSearchService<T> {
      * @return
      */
     List<String> suggest(String partner, String sub, String qt);
+    
+    /**
+     * 添加搜索建议
+     * @return
+     */
+    void addSuggest(List<SuggestDoc> suggests);
 }
